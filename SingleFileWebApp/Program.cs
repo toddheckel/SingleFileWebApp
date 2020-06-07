@@ -2,9 +2,10 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using NLog.Web;
 
 namespace SingleFileWebApp
 {
@@ -34,10 +35,16 @@ namespace SingleFileWebApp
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             var builder = Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            })
+            .ConfigureLogging(logging =>
+            {
+                logging.ClearProviders();
+                logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+            })
+            .UseNLog();
 
             if ((!Debugger.IsAttached && args.Contains("--service")))
             {
